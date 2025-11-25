@@ -27,32 +27,27 @@ wss.on("connection", (ws) => {
     console.log({data})
     if (!robotProcess) return;
 
-    if (data.type === "mouse-move") {
-      x=data?.x 
-      y=data?.y 
-      
-     //robotProcess.send({ type: "move", x: data.x, y: data.y });
+    if (data.type === "mouse-move") {   
+    robotProcess.send({ type: "move", x: data.x, y: data.y });
     }
 
     if (data.type === "mouse-click") { 
-      // robotProcess.send({ type: "click" });
+     robotProcess.send({ type: "click" });
     }
 
-    if (data.type === "mouse-right-click") {
-    //  robotProcess.send({ type: "right-click" });
-    }
+    if (data.type === "mouse-left-click") { 
+   //   robotProcess.send({ type: "move", x: x, y: y })
+  //  robotProcess.send({ type: "left-click" });
+  }
 
-    if (data.type === "key-press") {
- console.log({x,y})
-      robotProcess.send({ type: "move", x,y });
-       robotProcess.send({ type: "click" });
-
-       setTimeout(()=>{
-          robotProcess.send({
+  if (data.type === "mouse-right-click") {  
+    robotProcess.send({ type: "right-click" });
+  }
+    if (data.type === "key-press") { 
+  robotProcess.send({
       type: "key",
       command: data.command,  // ex: "a", "Enter"
     });
-},1000)
       //robotProcess.send({ type: "key", key: data.key });
     }
   });

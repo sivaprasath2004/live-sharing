@@ -1,11 +1,11 @@
-import React, { useEffect, useRef } from "react";
-
-export default function App() {
+import React, { useEffect, useRef,useState } from "react";
+import Menu from "./Menu";
+export  function App() {
   const videoRef = useRef();
   const ws = useRef(null);
 
   useEffect(() => {
-    ws.current = new WebSocket("ws://localhost:8899");
+    ws.current = new WebSocket("wss://audience-attended-rely-capability.trycloudflare.com");
     startScreenShare();
        window.addEventListener("keydown", handleKeyDown);
 
@@ -58,19 +58,44 @@ export default function App() {
       y: relY,
     }));
   }
-
+let lastClick = 0;
   function onClick() {
-    ws.current.send(JSON.stringify({ type: "mouse-click" }));
-  }
+    const now = Date.now();
+  if (now - lastClick < 150) return;  
+  lastClick = now;
 
+  ws.current.send(JSON.stringify({ type: "mouse-click" }));
+  }
+function sendClick(button) {
+  if(button === "left"){
+
+  }else{
+  ws.current.send(JSON.stringify({
+    type: button === "left" ? "mouse-left-click" : "mouse-right-click"
+  }));
+}
+}
   return (
-    <div > 
+    <div style={{height:'100vh',backgroundColor:"#272727ce",width:'100vw',display:'flex',justifyContent:'center',alignItems:'center' }}> 
       <video
         ref={videoRef}
-        style={{ width: "100%", border: "2px solid black" }}
+        style={{ maxWidth: "99.5%",maxHeight:"98vh", border: "2px solid black" }}
         onMouseMove={onMouseMove}
-        onClick={onClick}
+        onClick={()=>onClick()}
+        onContextMenu={(e) => { 
+        e.preventDefault();   // prevent browser menu
+        sendClick("right");
+      }}
       />
     </div>
   );
 }
+
+
+ const APPDefault=()=>{
+  const [stage,setStage]=useState("Menu")
+  return stage=="Menu"?<Menu />:<App />
+  // return <App />
+}
+
+export default APPDefault

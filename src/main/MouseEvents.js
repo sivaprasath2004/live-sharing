@@ -53,7 +53,13 @@ process.on("message", (msg) => {
       console.error("Mouse move error:", err);
     }
   }
+  if (msg.type === "left-click") {
+    robot.mouseClick("left");
+  }
 
+  if (msg.type === "right-click") {
+    robot.mouseClick("right");
+  }
   if (msg.type === "click") {
     try {
       robot.mouseClick();
