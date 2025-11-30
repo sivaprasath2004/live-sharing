@@ -6,6 +6,7 @@ export type Channels = 'ipc-example';
 
 const electronHandler = {
   ipcRenderer: {
+     getScreenURL: () => ipcRenderer.invoke("get-cloudserverUrl"),
      getScreenStream: () => ipcRenderer.invoke("get-screen-stream"),
     sendMessage(channel: Channels, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);

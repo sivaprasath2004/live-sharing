@@ -6,16 +6,29 @@ import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import MenuBuilder from "./menu";
 import { resolveHtmlPath } from "./util";
+const startTunnel = require("./cloudflareModule");
 const { fork } = require("child_process");
 const WebSocket = require("ws");
 
 let mainWindow = null;
 let robotProcess = null;
 let wsClient = null;
-
+let url=null
 // ------------------------------
 //   WEBSOCKET SERVER
 // ------------------------------
+
+const StarTunnel=async()=>{
+    
+ const cloudflareExe = app.isPackaged
+  ? path.join(process.cwd(), "resources", "cloudflared-windows-386.exe")
+    :  path.join(process.cwd(), "resources", "cloudflared-windows-386.exe")
+   console.log({cloudflareExe, p:8899 })
+  url = await startTunnel(cloudflareExe, 8899);
+
+  console.log("Tunnel running at:", path.join(process.cwd(), "resources", "cloudflared.exe"),url, cloudflareExe, 8899);
+} 
+StarTunnel()
 const wss = new WebSocket.Server({ port: 8899 });
 let x=0
 let y=0
@@ -67,6 +80,10 @@ class AppUpdater {
 // ------------------------------
 //   SCREEN STREAM IPC
 // ------------------------------
+
+ipcMain.handle("get-cloudserverUrl",async ()=>{
+   return url
+})
 ipcMain.handle("get-screen-stream", async () => {
   const sources = await desktopCapturer.getSources({ types: ["screen"] });
   return sources[0].id;
