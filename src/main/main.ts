@@ -14,6 +14,8 @@ let mainWindow = null;
 let robotProcess = null;
 let wsClient = null;
 let url=null
+let win=null
+let isOpen=false
 // ------------------------------
 //   WEBSOCKET SERVER
 // ------------------------------
@@ -35,9 +37,17 @@ let y=0
 wss.on("connection", (ws) => {
   wsClient = ws;
 
-  ws.on("message", (msg) => {
+  ws.on("message", (msg,isBinary) => {
+    console.log({
+      isBinary
+    })
+    if(isBinary){ 
+     mainWindow.webContents.send('on-voice', msg); 
+     return 
+    }
     const data = JSON.parse(msg);
     console.log({data})
+    
     if (!robotProcess) return;
 
     if (data.type === "mouse-move") {   
@@ -121,6 +131,41 @@ const createWindow = async () => {
   new AppUpdater();
 };
 
+
+
+
+function createChatWindow() {
+    win = new BrowserWindow({
+    width: 70,
+    height: 70,
+      transparent: true,     // ✅ Transparent background
+    frame: false,          // ❌ Remove OS window frame
+    alwaysOnTop: true,     // Optional (floating window)
+    autoHideMenuBar:true,
+    resizable: false,
+    // hasShadow: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload.js"),
+    },
+  });
+
+  win.loadURL(resolveHtmlPath("/chat"));
+}
+
+
+ipcMain.handle("set-screen-size-chat", async (event, width, height) => {
+  const [x, y] = win.getPosition();
+  const [oldW, oldH] = win.getSize();
+
+  const newX = x + (oldW - width);
+  const newY = y + (oldH - height);
+
+  win.setBounds(
+    { x: newX, y: newY, width, height },
+    true
+  );
+});
+
 // ------------------------------
 //   APP READY
 // ------------------------------
@@ -141,6 +186,7 @@ app.whenReady().then(() => {
 
 
   createWindow();
+  createChatWindow();
 
   app.on("activate", () => {
     if (mainWindow === null) createWindow();

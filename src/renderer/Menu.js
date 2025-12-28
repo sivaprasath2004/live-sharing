@@ -2,7 +2,7 @@ import React,{useState,useEffect, useRef} from 'react'
 import DownloadButton from './Ui/Download.File.Button'
 import {Button,Input} from 'antd'
 import InputUi from './Ui/Input.Ui'
-import "./App.css"
+
 const Menu = () => {
   const [url,setURL]=useState(false)
   const websockets=useRef(null)

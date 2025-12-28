@@ -8,6 +8,7 @@ const electronHandler = {
   ipcRenderer: {
      getScreenURL: () => ipcRenderer.invoke("get-cloudserverUrl"),
      getScreenStream: () => ipcRenderer.invoke("get-screen-stream"),
+     setScreenSize:(width, height)=>ipcRenderer.invoke("set-screen-size-chat",width, height),
     sendMessage(channel: Channels, ...args: unknown[]) {
       ipcRenderer.send(channel, ...args);
     },

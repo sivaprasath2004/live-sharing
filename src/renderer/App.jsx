@@ -1,10 +1,23 @@
 import React, { useEffect, useRef,useState } from "react";
 import Menu from "./Menu";
+import VoiceSender from "./VoiceSender";
+import { initAudioPlayer,playAudio } from "./VoiceSender";
+import { BrowserRouter as Router,Route,Routes } from "react-router-dom";
+import Chat from "./Chat";
+import "./App.css"
 export  function App() {
   const videoRef = useRef();
   const ws = useRef(null);
+ 
+//  window.electron.ipcRenderer.on("on-voice",(_,data)=>{
+//   console.log("coming voice data",_.buffer)
+//     playAudio(_.buffer)
+//  })
+
+
 
   useEffect(() => {
+    // initAudioPlayer()
     ws.current = new WebSocket("wss://audience-attended-rely-capability.trycloudflare.com");
     startScreenShare();
        window.addEventListener("keydown", handleKeyDown);
@@ -76,6 +89,8 @@ function sendClick(button) {
 }
 }
   return (
+    <>
+    {/* <VoiceSender /> */}
     <div style={{height:'100vh',backgroundColor:"#272727ce",width:'100vw',display:'flex',justifyContent:'center',alignItems:'center' }}> 
       <video
         ref={videoRef}
@@ -88,14 +103,20 @@ function sendClick(button) {
       }}
       />
     </div>
+    </>
   );
 }
 
 
  const APPDefault=()=>{
   const [stage,setStage]=useState("Menu")
-  return stage=="Menu"?<Menu />:<App />
-  // return <App />
+  // return stage=="Menu"?<Menu />:<App />
+  return  <Router>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/chat" element={<Chat />} />
+      </Routes>
+    </Router>
 }
 
 export default APPDefault
